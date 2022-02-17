@@ -1,8 +1,10 @@
 package io.github.alen_alex.helpcord.listener;
 
 import io.github.alen_alex.helpcord.HelpCord;
+import io.github.alen_alex.helpcord.enums.CooldownKeys;
 import io.github.alen_alex.helpcord.enums.Tags;
 import io.github.alen_alex.helpcord.abstracts.AbstractListener;
+import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.models.CodeBlocks;
 import io.github.alen_alex.helpcord.utils.PasteUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -10,8 +12,8 @@ import org.javacord.api.listener.message.MessageCreateListener;
 
 public class PasteListener extends AbstractListener implements MessageCreateListener {
 
-    public PasteListener(HelpCord instance) {
-        super(instance);
+    public PasteListener(HelpCord handler) {
+        super(handler);
         register();
     }
 
@@ -40,8 +42,33 @@ public class PasteListener extends AbstractListener implements MessageCreateList
             return;
         }
 
+        if(instance.getCooldownRegistry().inCooldown(messageCreateEvent.getMessageAuthor().getIdAsString(),CooldownKeys.PASTE)){
+            //TODO SEND COOLDOWN MESSAGE
+            return;
+        }
+
         CodeBlocks blocks = PasteUtils.parseLanguage(message);
-        blocks.upload();
+        blocks.upload().thenAccept(oString -> {
+           if(oString.isEmpty()){
+               Debug.debug("Failed to create new paste of !");
+               //TODO Failed Embed!
+           }else {
+               final String url = Tags.PASTE_DOMAIN.getTag()+"/"+oString.get();
+               instance.getLogger().info("Created new paste ["
+                       +blocks.getLanguage()
+                       +"] for "
+                       +messageCreateEvent.getMessageAuthor().getDisplayName()
+                       +"["+messageCreateEvent.getMessageAuthor().getIdAsString()+"]"
+                       +" with a successful API response of "
+                       +url
+               );
+               messageCreateEvent.getMessage().delete("The code block has been uploaded to "+url);
+               messageCreateEvent.getChannel().sendMessage(url);
+               Debug.debug("Finishing up paste on "+oString.get());
+               //TODO Success Message
+                instance.getCooldownRegistry().updateCooldown(messageCreateEvent.getMessageAuthor().getIdAsString(),CooldownKeys.PASTE);
+           }
+        });
     }
 
     @Override

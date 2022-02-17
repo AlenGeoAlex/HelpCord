@@ -4,6 +4,7 @@ public enum Tags {
     CODE_BLOCK("```"),
     CODE_BLOCK_REGEX("```(\\w+)\\n[^`]+```"),
     PASTE_API("https://api.pastes.dev/post"),
+    PASTE_DOMAIN("https://paste.alenalex.me"),
     ;
 
     Tags(String tag) {

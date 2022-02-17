@@ -2,6 +2,7 @@ package io.github.alen_alex.helpcord.configuration.files;
 
 import de.leonhard.storage.Config;
 import de.leonhard.storage.internal.FlatFile;
+import de.leonhard.storage.sections.FlatFileSection;
 import io.github.alen_alex.helpcord.abstracts.AbstractFile;
 import io.github.alen_alex.helpcord.configuration.ConfigPath;
 import io.github.alen_alex.helpcord.configuration.IConfig;
@@ -21,7 +22,8 @@ public class Configuration extends AbstractFile implements IConfig {
 
     private String botToken,botOwner;
 
-    private boolean pasteGlobal;
+    private boolean pasteGlobal,pasteEnabled,pasteCooldownEnabled;
+    private FlatFileSection cooldownSettings;
     private List<String> pasteChannels;
 
     public Configuration(@NotNull final ConfigurationHandler handler) {
@@ -52,7 +54,10 @@ public class Configuration extends AbstractFile implements IConfig {
         this.botOwner = getString(ConfigPath.BOT_OWNER.getPath());
 
         this.pasteGlobal = getBoolean(ConfigPath.PASTE_GLOBAL.getPath());
+        this.pasteEnabled = getBoolean(ConfigPath.PASTE_ENABLED.getPath());
+        this.pasteCooldownEnabled = getBoolean(ConfigPath.PASTE_COOL_DOWN_ENABLED.getPath());
         this.pasteChannels = baseFile.getStringList(ConfigPath.PASTE_CHANNELS.getPath());
+        this.cooldownSettings = getSectionOn(ConfigPath.PASTE_COOL_DOWN.getPath());
         Debug.debug("Loaded "+pasteChannels.size()+" channels for checking paste configuration!");
     }
 
@@ -101,5 +106,17 @@ public class Configuration extends AbstractFile implements IConfig {
 
     public boolean isPasteGlobal() {
         return pasteGlobal;
+    }
+
+    public boolean isPasteEnabled() {
+        return pasteEnabled;
+    }
+
+    public boolean isPasteCooldownEnabled() {
+        return pasteCooldownEnabled;
+    }
+
+    public FlatFileSection getCooldownSettings() {
+        return cooldownSettings;
     }
 }

@@ -5,6 +5,8 @@ import io.github.alen_alex.helpcord.configuration.files.Configuration;
 import io.github.alen_alex.helpcord.javacord.JavaCord;
 import org.javacord.api.DiscordApi;
 
+import java.util.HashMap;
+
 public abstract class AbstractListener {
 
     protected HelpCord instance;

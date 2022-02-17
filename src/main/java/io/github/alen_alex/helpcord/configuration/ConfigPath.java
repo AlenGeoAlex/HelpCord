@@ -4,6 +4,9 @@ public enum ConfigPath {
         BOT_TOKEN("bot.auth.token", true, null),
         BOT_OWNER("bot.auth.owner-id",true,"403569609518743552"),
 
+        PASTE_ENABLED("paste-settings.enabled",true,true),
+        PASTE_COOL_DOWN("paste-settings.cooldown",true,null),
+        PASTE_COOL_DOWN_ENABLED("paste-settings.cooldown.enabled",true,true),
         PASTE_GLOBAL("paste-settings.global",true, true),
         PASTE_CHANNELS("paste-settings.channels",false, null)
     ;

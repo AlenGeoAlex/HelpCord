@@ -1,12 +1,16 @@
 package io.github.alen_alex.helpcord;
 
 
+import io.github.alen_alex.helpcord.enums.CooldownKeys;
 import io.github.alen_alex.helpcord.exceptions.IllegalInstanceAccess;
+import io.github.alen_alex.helpcord.exceptions.RegisterExistingData;
 import io.github.alen_alex.helpcord.handler.ConfigurationHandler;
+import io.github.alen_alex.helpcord.registry.CooldownRegistry;
 import io.github.alen_alex.helpcord.javacord.JavaCord;
 import io.github.alen_alex.helpcord.listener.PasteListener;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.logs.LoggerBuilder;
+import io.github.alen_alex.helpcord.models.Cooldowns;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +30,9 @@ public class HelpCord {
     //Handlers
     private final ConfigurationHandler configurationHandler;
 
+    //Registry
+    private final CooldownRegistry cooldownRegistry;
+
     //JavaCord Instance
     private final JavaCord javaCord;
 
@@ -39,6 +46,7 @@ public class HelpCord {
             logger.info("Data folder was missing! created...");
         }
         this.configurationHandler = new ConfigurationHandler(this);
+        this.cooldownRegistry = new CooldownRegistry(this);
         this.javaCord = new JavaCord(this);
         Debug.debug("Successfully instantiated HelpCord Instance!");
     }
@@ -64,7 +72,14 @@ public class HelpCord {
         }
 
         new PasteListener(this);
-        getLogger().info("Connected to Discord!");
+
+
+
+            getLogger().info("Connected to Discord!");
+    }
+
+    public void reload(){
+
     }
 
     @NotNull
@@ -96,5 +111,19 @@ public class HelpCord {
             throw new IllegalInstanceAccess("The instance is not yet instantiated!");
 
         return INSTANCE;
+    }
+
+    public CooldownRegistry getCooldownRegistry() {
+        return cooldownRegistry;
+    }
+
+    public void registerCooldowns(){
+        if(configurationHandler.getConfiguration().isPasteCooldownEnabled()){
+            try {
+                getCooldownRegistry().registerCooldown(Cooldowns.buildFrom(this.configurationHandler.getConfiguration().getCooldownSettings(), CooldownKeys.PASTE.getKey()));
+            } catch (RegisterExistingData e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

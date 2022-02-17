@@ -4,6 +4,10 @@ bot:
     owner-id: "403569609518743552"
 
 paste-settings:
+  enabled: true
+  cooldown:
+    enabled: true
+    excluded-roles: []
+    duration-in-sec: 10
   global: true
-  channels:
-    -
+  channels: []
