@@ -2,3 +2,8 @@ bot:
   auth:
     token: ""
     owner-id: "403569609518743552"
+
+paste-settings:
+  global: true
+  channels:
+    -

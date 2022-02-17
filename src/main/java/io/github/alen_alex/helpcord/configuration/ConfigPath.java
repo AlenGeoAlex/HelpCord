@@ -1,15 +1,16 @@
 package io.github.alen_alex.helpcord.configuration;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
 public enum ConfigPath {
-        BOT_TOKEN("bot.auth.token", true),
-        BOT_OWNER("bot.auth.owner-id",true)
+        BOT_TOKEN("bot.auth.token", true, null),
+        BOT_OWNER("bot.auth.owner-id",true,"403569609518743552"),
+
+        PASTE_GLOBAL("paste-settings.global",true, true),
+        PASTE_CHANNELS("paste-settings.channels",false, null)
     ;
 
     private String path;
     private boolean isStrict;
+    private Object def;
 
     ConfigPath(String path) {
         this.path = path;
@@ -20,6 +21,12 @@ public enum ConfigPath {
         this.isStrict = isStrict;
     }
 
+    ConfigPath(String path, boolean isStrict, Object def) {
+        this.path = path;
+        this.isStrict = isStrict;
+        this.def = def;
+    }
+
     public String getPath() {
         return path;
     }
@@ -28,4 +35,7 @@ public enum ConfigPath {
         return isStrict;
     }
 
+    public Object getDef() {
+        return def;
+    }
 }

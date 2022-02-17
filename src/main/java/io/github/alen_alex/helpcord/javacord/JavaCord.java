@@ -4,6 +4,14 @@ import io.github.alen_alex.helpcord.HelpCord;
 import io.github.alen_alex.helpcord.logs.Debug;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class JavaCord {
 
@@ -33,4 +41,21 @@ public class JavaCord {
         }
         return javaCord != null ;
     }
+
+    public DiscordApi getJavaCordAPI() {
+        return javaCord;
+    }
+
+    public Iterator<Server> getAllServers(){
+        return javaCord.getServers().iterator();
+    }
+
+    public Iterator<Server> getAllServerIf(final Predicate<Server> condition){
+        return javaCord.getServers().stream().filter(condition).iterator();
+    }
+
+    public Optional<Server> getServerOf(@NotNull String id){
+        return javaCord.getServerById(id);
+    }
+
 }

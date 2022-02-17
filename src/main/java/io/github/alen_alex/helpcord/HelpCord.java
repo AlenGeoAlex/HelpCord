@@ -1,8 +1,10 @@
 package io.github.alen_alex.helpcord;
 
 
+import io.github.alen_alex.helpcord.exceptions.IllegalInstanceAccess;
 import io.github.alen_alex.helpcord.handler.ConfigurationHandler;
 import io.github.alen_alex.helpcord.javacord.JavaCord;
+import io.github.alen_alex.helpcord.listener.PasteListener;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.logs.LoggerBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +18,7 @@ import java.util.logging.Logger;
 public class HelpCord {
     //Statics
     public final static String NAME = "HelpCord";
-
+    private static HelpCord INSTANCE = null;
     //Final Variables
     private final Logger logger;
     private final File dataFolder;
@@ -42,6 +44,7 @@ public class HelpCord {
     }
 
     public void start(){
+        INSTANCE = this;
         Debug.debug("Preparing to start connection");
         if(!configurationHandler.initFiles()){
             Debug.err("Failed on initFiles!");
@@ -60,6 +63,7 @@ public class HelpCord {
             System.exit(-1);
         }
 
+        new PasteListener(this);
         getLogger().info("Connected to Discord!");
     }
 
@@ -85,5 +89,12 @@ public class HelpCord {
 
     public JavaCord getJavaCord() {
         return javaCord;
+    }
+
+    public static HelpCord getInstance(){
+        if(INSTANCE == null)
+            throw new IllegalInstanceAccess("The instance is not yet instantiated!");
+
+        return INSTANCE;
     }
 }

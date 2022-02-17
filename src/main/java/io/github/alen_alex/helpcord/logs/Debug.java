@@ -3,12 +3,14 @@ package io.github.alen_alex.helpcord.logs;
 import io.github.alen_alex.helpcord.HelpCord;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.logging.*;
 
 public class Debug extends Formatter {
 
     private static final Logger logger;
     private static boolean enabled;
+    //private static List<String> debugList;
 
     static {
         logger = Logger.getLogger("HC DEBUG");

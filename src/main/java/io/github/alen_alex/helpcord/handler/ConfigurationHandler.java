@@ -6,7 +6,7 @@ import io.github.alen_alex.helpcord.logs.Debug;
 
 public class ConfigurationHandler {
 
-    private HelpCord instance;
+    private final HelpCord instance;
     private Configuration configuration;
 
     public ConfigurationHandler(HelpCord instance) {
