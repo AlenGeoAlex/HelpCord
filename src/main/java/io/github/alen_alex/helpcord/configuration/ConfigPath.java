@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public enum ConfigPath {
-        BOT_TOKEN("bot.auth.token", true)
+        BOT_TOKEN("bot.auth.token", true),
+        BOT_OWNER("bot.auth.owner-id",true)
     ;
 
     private String path;
@@ -27,7 +28,4 @@ public enum ConfigPath {
         return isStrict;
     }
 
-    public Iterator<ConfigPath> getStrictEnums(){
-        return Arrays.stream(ConfigPath.values()).filter(ConfigPath::isStrict).iterator();
-    }
 }

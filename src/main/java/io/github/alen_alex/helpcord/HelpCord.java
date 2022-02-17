@@ -2,6 +2,7 @@ package io.github.alen_alex.helpcord;
 
 
 import io.github.alen_alex.helpcord.handler.ConfigurationHandler;
+import io.github.alen_alex.helpcord.javacord.JavaCord;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.logs.LoggerBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,9 @@ public class HelpCord {
     //Handlers
     private final ConfigurationHandler configurationHandler;
 
+    //JavaCord Instance
+    private final JavaCord javaCord;
+
     public HelpCord() throws URISyntaxException {
         new Debug();
         this.logger = new LoggerBuilder().getLogger();
@@ -33,16 +37,30 @@ public class HelpCord {
             logger.info("Data folder was missing! created...");
         }
         this.configurationHandler = new ConfigurationHandler(this);
+        this.javaCord = new JavaCord(this);
+        Debug.debug("Successfully instantiated HelpCord Instance!");
     }
 
     public void start(){
+        Debug.debug("Preparing to start connection");
         if(!configurationHandler.initFiles()){
+            Debug.err("Failed on initFiles!");
             System.exit(-1);
         }
 
-        if(configurationHandler.getConfiguration().validateConfiguration()){
+        if(!configurationHandler.getConfiguration().validateConfiguration()){
+            Debug.err("Failed on ConfigValidation!");
             System.exit(-1);
         }
+
+        configurationHandler.getConfiguration().loadConfiguration();
+
+        if(!javaCord.connect()){
+            Debug.err("Failed to connect to Discord");
+            System.exit(-1);
+        }
+
+        getLogger().info("Connected to Discord!");
     }
 
     @NotNull
@@ -55,9 +73,17 @@ public class HelpCord {
         return dataFolder;
     }
 
+    @NotNull
+    public ConfigurationHandler getConfigurationHandler() {
+        return configurationHandler;
+    }
 
     @Nullable
     public InputStream getResourceAsStream(@NotNull String name){
-        return this.getClass().getResourceAsStream(name);
+        return this.getClass().getClassLoader().getResourceAsStream(name);
+    }
+
+    public JavaCord getJavaCord() {
+        return javaCord;
     }
 }

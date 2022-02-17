@@ -46,12 +46,6 @@
                                     <shadedPattern>io.github.alen_alex.helpcord.shading.storage</shadedPattern>
                                 </relocation>
                             </relocations>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                </transformer>
-                            </transformers>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -117,6 +111,12 @@
             <version>3.12.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.javacord</groupId>
+            <artifactId>javacord</artifactId>
+            <version>3.4.0</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
     <pluginRepositories>
         <pluginRepository>

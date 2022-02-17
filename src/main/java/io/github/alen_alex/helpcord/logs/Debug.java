@@ -8,11 +8,11 @@ import java.util.logging.*;
 public class Debug extends Formatter {
 
     private static final Logger logger;
-    private static boolean enabled = false;
+    private static boolean enabled;
 
     static {
         logger = Logger.getLogger("HC DEBUG");
-
+        enabled = false;
     }
 
     private static final String WARN_PREFIX = "[HC DEBUG - WARN] %s \n";
