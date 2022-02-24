@@ -1,6 +1,6 @@
 package io.github.alen_alex.helpcord.utils;
 
-import io.github.alen_alex.helpcord.configuration.ConfigPath;
+import io.github.alen_alex.helpcord.enums.ConfigPath;
 
 import java.util.Arrays;
 import java.util.Iterator;

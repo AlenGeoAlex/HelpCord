@@ -1,16 +1,14 @@
 package io.github.alen_alex.helpcord;
 
 
-import io.github.alen_alex.helpcord.enums.CooldownKeys;
 import io.github.alen_alex.helpcord.exceptions.IllegalInstanceAccess;
-import io.github.alen_alex.helpcord.exceptions.RegisterExistingData;
 import io.github.alen_alex.helpcord.handler.ConfigurationHandler;
 import io.github.alen_alex.helpcord.registry.CooldownRegistry;
 import io.github.alen_alex.helpcord.javacord.JavaCord;
 import io.github.alen_alex.helpcord.listener.PasteListener;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.logs.LoggerBuilder;
-import io.github.alen_alex.helpcord.models.Cooldowns;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +34,9 @@ public class HelpCord {
     //JavaCord Instance
     private final JavaCord javaCord;
 
+    //Interactive Console
+    private final InteractiveConsole console;
+
     public HelpCord() throws URISyntaxException {
         new Debug();
         this.logger = new LoggerBuilder().getLogger();
@@ -48,38 +49,54 @@ public class HelpCord {
         this.configurationHandler = new ConfigurationHandler(this);
         this.cooldownRegistry = new CooldownRegistry(this);
         this.javaCord = new JavaCord(this);
+        this.console = new InteractiveConsole(this);
         Debug.debug("Successfully instantiated HelpCord Instance!");
     }
 
     public void start(){
         INSTANCE = this;
+        console.start();
         Debug.debug("Preparing to start connection");
         if(!configurationHandler.initFiles()){
-            Debug.err("Failed on initFiles!");
-            System.exit(-1);
+            end("Failed on initFiles!",true);
         }
 
         if(!configurationHandler.getConfiguration().validateConfiguration()){
-            Debug.err("Failed on ConfigValidation!");
-            System.exit(-1);
+            end("Failed on ConfigValidation!",true);
         }
 
         configurationHandler.getConfiguration().loadConfiguration();
 
         if(!javaCord.connect()){
-            Debug.err("Failed to connect to Discord");
-            System.exit(-1);
+            end("Failed to connect to Discord",true);
         }
 
         new PasteListener(this);
 
 
-
-            getLogger().info("Connected to Discord!");
+        getLogger().info("Connected to Discord!");
     }
 
     public void reload(){
 
+    }
+
+    public void end(@Nullable String message, boolean errClose){
+        if(StringUtils.isNotBlank(message)) {
+            if(errClose)
+                Debug.err(message);
+            else Debug.debug(message);
+        }
+        if(javaCord != null && javaCord.getJavaCordAPI() != null) {
+            this.logger.info("Disconnecting JavaCord Connection!");
+            this.javaCord.getJavaCordAPI().disconnect();
+        }
+        if(this.console != null && this.console.isAlive()) {
+            this.logger.info("Stopping active threads!");
+            console.interrupt();
+        }
+        this.logger.info("Goodbye!");
+        System.exit(-1);
     }
 
     @NotNull
@@ -117,13 +134,7 @@ public class HelpCord {
         return cooldownRegistry;
     }
 
-    public void registerCooldowns(){
-        if(configurationHandler.getConfiguration().isPasteCooldownEnabled()){
-            try {
-                getCooldownRegistry().registerCooldown(Cooldowns.buildFrom(this.configurationHandler.getConfiguration().getCooldownSettings(), CooldownKeys.PASTE.getKey()));
-            } catch (RegisterExistingData e) {
-                e.printStackTrace();
-            }
-        }
+    public void registerCoolDowns(){
+
     }
 }

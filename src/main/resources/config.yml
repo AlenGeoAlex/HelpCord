@@ -6,7 +6,6 @@ bot:
 paste-settings:
   enabled: true
   cooldown:
-    enabled: true
     excluded-roles: []
     duration-in-sec: 10
   global: true

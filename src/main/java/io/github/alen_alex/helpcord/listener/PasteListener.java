@@ -42,11 +42,6 @@ public class PasteListener extends AbstractListener implements MessageCreateList
             return;
         }
 
-        if(instance.getCooldownRegistry().inCooldown(messageCreateEvent.getMessageAuthor().getIdAsString(),CooldownKeys.PASTE)){
-            //TODO SEND COOLDOWN MESSAGE
-            return;
-        }
-
         CodeBlocks blocks = PasteUtils.parseLanguage(message);
         blocks.upload().thenAccept(oString -> {
            if(oString.isEmpty()){
@@ -66,7 +61,6 @@ public class PasteListener extends AbstractListener implements MessageCreateList
                messageCreateEvent.getChannel().sendMessage(url);
                Debug.debug("Finishing up paste on "+oString.get());
                //TODO Success Message
-                instance.getCooldownRegistry().updateCooldown(messageCreateEvent.getMessageAuthor().getIdAsString(),CooldownKeys.PASTE);
            }
         });
     }
