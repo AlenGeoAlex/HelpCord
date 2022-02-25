@@ -1,0 +1,34 @@
+id: example
+text:
+  - "Normal Text"
+embed:
+  title: "**Example Message!"
+  author:
+    name: "Alen Alex"
+    url: "alenalex.me"
+    icon:
+      local: true
+      url: "/unknown.png"
+  color: RED
+  thumbnail:
+    local: true
+    url: "/unknown.png"
+  footer:
+    text: "This is a sample text"
+    icon:
+      local: false
+      url: "https://cdn.discordapp.com/attachments/866939213013712927/919533478415040512/photo.jpg"
+  show-timestamp: true
+  image:
+    local:
+    url:
+  description: "Description!"
+  fields:
+    1:
+      title: "Field Title"
+      value: "This is a field title"
+      inline: false
+    2:
+      title: "Field Title #2"
+      value: "This is a field title #2"
+      inline: false

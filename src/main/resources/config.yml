@@ -3,6 +3,10 @@ bot:
     token: ""
     owner-id: "403569609518743552"
 
+messages:
+  - "/messages/example.yml"
+
+
 paste-settings:
   enabled: true
   cooldown:

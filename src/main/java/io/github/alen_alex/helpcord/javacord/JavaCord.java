@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -34,6 +35,8 @@ public class JavaCord {
                     .setWaitForServersOnStartup(true)
                     .setWaitForUsersOnStartup(true)
                     .login().join();
+            FallbackLoggerConfiguration.setDebug(true);
+            FallbackLoggerConfiguration.setTrace(true);
         }catch (Exception e){
 
             e.printStackTrace();

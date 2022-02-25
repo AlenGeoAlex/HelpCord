@@ -12,6 +12,7 @@ import io.github.alen_alex.helpcord.utils.ConfigUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,6 +27,8 @@ public class Configuration extends AbstractFile implements IConfig {
     private FlatFileSection cooldownSettings;
     private List<String> pasteChannels;
 
+    private List<File> messagesFiles;
+
     public Configuration(@NotNull final ConfigurationHandler handler) {
         super(new Config("config.yml",
                 handler.getInstance().getDataFolder().getPath(),
@@ -34,6 +37,7 @@ public class Configuration extends AbstractFile implements IConfig {
         this.handler = handler;
 
         this.pasteChannels = new ArrayList<>();
+        this.messagesFiles = new ArrayList<>();
     }
 
     @Override
@@ -44,6 +48,7 @@ public class Configuration extends AbstractFile implements IConfig {
     @Override
     public long reload() {
         pasteChannels.clear();
+        messagesFiles.clear();
         return 0;
     }
 
@@ -58,6 +63,10 @@ public class Configuration extends AbstractFile implements IConfig {
         this.pasteChannels = baseFile.getStringList(ConfigPath.PASTE_CHANNELS.getPath());
         this.cooldownSettings = getSectionOn(ConfigPath.PASTE_COOL_DOWN.getPath());
         Debug.debug("Loaded "+pasteChannels.size()+" channels for checking paste configuration!");
+
+        this.baseFile.getStringList(ConfigPath.MESSAGES.getPath()).iterator().forEachRemaining((pathString) -> {
+            messagesFiles.add(new File(handler.getInstance().getDataFolder().getAbsoluteFile()+pathString));
+        });
     }
 
     //https://bytebin.lucko.me/BiBsbwOGzm
@@ -114,5 +123,9 @@ public class Configuration extends AbstractFile implements IConfig {
 
     public FlatFileSection getCooldownSettings() {
         return cooldownSettings;
+    }
+
+    public List<File> getMessagesFiles() {
+        return messagesFiles;
     }
 }

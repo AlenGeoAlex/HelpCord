@@ -1,6 +1,7 @@
 package io.github.alen_alex.helpcord;
 
 
+import io.github.alen_alex.helpcord.command.TestListener;
 import io.github.alen_alex.helpcord.exceptions.IllegalInstanceAccess;
 import io.github.alen_alex.helpcord.handler.ConfigurationHandler;
 import io.github.alen_alex.helpcord.registry.CooldownRegistry;
@@ -8,6 +9,8 @@ import io.github.alen_alex.helpcord.javacord.JavaCord;
 import io.github.alen_alex.helpcord.listener.PasteListener;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.logs.LoggerBuilder;
+import io.github.alen_alex.helpcord.registry.MessageRegistry;
+import io.github.alen_alex.helpcord.utils.ConfigUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +33,7 @@ public class HelpCord {
 
     //Registry
     private final CooldownRegistry cooldownRegistry;
+    private final MessageRegistry messageRegistry;
 
     //JavaCord Instance
     private final JavaCord javaCord;
@@ -46,10 +50,19 @@ public class HelpCord {
             dataFolder.mkdirs();
             logger.info("Data folder was missing! created...");
         }
+
+        final File messageFolder = new File(dataFolder.getAbsolutePath(), "messages");
+        if(!messageFolder.exists()){
+            messageFolder.mkdirs();
+            Debug.debug("Message folder has been created");
+            final File messageExample = new File(messageFolder.getAbsolutePath(), "example.yml");
+            ConfigUtils.saveResourceTo(getResourceAsStream("example.yml"),messageExample, "example.yml");
+        }
         this.configurationHandler = new ConfigurationHandler(this);
         this.cooldownRegistry = new CooldownRegistry(this);
         this.javaCord = new JavaCord(this);
         this.console = new InteractiveConsole(this);
+        this.messageRegistry = new MessageRegistry(this);
         Debug.debug("Successfully instantiated HelpCord Instance!");
     }
 
@@ -67,11 +80,15 @@ public class HelpCord {
 
         configurationHandler.getConfiguration().loadConfiguration();
 
+        messageRegistry.registerMessages(configurationHandler.getConfiguration().getMessagesFiles());
+        getLogger().info("Registered "+messageRegistry.size()+" out of "+configurationHandler.getConfiguration().getMessagesFiles().size());
+
         if(!javaCord.connect()){
             end("Failed to connect to Discord",true);
         }
 
         new PasteListener(this);
+        new TestListener(this);
 
 
         getLogger().info("Connected to Discord!");
@@ -136,5 +153,9 @@ public class HelpCord {
 
     public void registerCoolDowns(){
 
+    }
+
+    public MessageRegistry getMessageRegistry() {
+        return messageRegistry;
     }
 }
