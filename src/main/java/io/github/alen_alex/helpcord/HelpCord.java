@@ -3,13 +3,14 @@ package io.github.alen_alex.helpcord;
 
 import io.github.alen_alex.helpcord.command.TestListener;
 import io.github.alen_alex.helpcord.exceptions.IllegalInstanceAccess;
+import io.github.alen_alex.helpcord.exceptions.IllegalRegistryKey;
 import io.github.alen_alex.helpcord.handler.ConfigurationHandler;
-import io.github.alen_alex.helpcord.registry.CooldownRegistry;
 import io.github.alen_alex.helpcord.javacord.JavaCord;
-import io.github.alen_alex.helpcord.listener.PasteListener;
+import io.github.alen_alex.helpcord.modules.PasteListener;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.logs.LoggerBuilder;
 import io.github.alen_alex.helpcord.registry.MessageRegistry;
+import io.github.alen_alex.helpcord.registry.ModuleRegistry;
 import io.github.alen_alex.helpcord.utils.ConfigUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +33,8 @@ public class HelpCord {
     private final ConfigurationHandler configurationHandler;
 
     //Registry
-    private final CooldownRegistry cooldownRegistry;
+    private final ModuleRegistry moduleRegistry;
     private final MessageRegistry messageRegistry;
-
     //JavaCord Instance
     private final JavaCord javaCord;
 
@@ -59,8 +59,8 @@ public class HelpCord {
             ConfigUtils.saveResourceTo(getResourceAsStream("example.yml"),messageExample, "example.yml");
         }
         this.configurationHandler = new ConfigurationHandler(this);
-        this.cooldownRegistry = new CooldownRegistry(this);
         this.javaCord = new JavaCord(this);
+        this.moduleRegistry = new ModuleRegistry(this);
         this.console = new InteractiveConsole(this);
         this.messageRegistry = new MessageRegistry(this);
         Debug.debug("Successfully instantiated HelpCord Instance!");
@@ -87,15 +87,23 @@ public class HelpCord {
             end("Failed to connect to Discord",true);
         }
 
-        new PasteListener(this);
         new TestListener(this);
-
+        try {
+            moduleRegistry.registerModules(
+                    new PasteListener(this)
+            );
+        } catch (IllegalRegistryKey e) {
+            e.printStackTrace();
+        }
 
         getLogger().info("Connected to Discord!");
+        moduleRegistry.initAllEnabledModules();
     }
 
     public void reload(){
+        moduleRegistry.disableAllEnabledModules();
 
+        moduleRegistry.initAllEnabledModules();
     }
 
     public void end(@Nullable String message, boolean errClose){
@@ -147,15 +155,11 @@ public class HelpCord {
         return INSTANCE;
     }
 
-    public CooldownRegistry getCooldownRegistry() {
-        return cooldownRegistry;
-    }
-
-    public void registerCoolDowns(){
-
-    }
-
     public MessageRegistry getMessageRegistry() {
         return messageRegistry;
+    }
+
+    public ModuleRegistry getModuleRegistry() {
+        return moduleRegistry;
     }
 }

@@ -1,24 +1,28 @@
-package io.github.alen_alex.helpcord.listener;
+package io.github.alen_alex.helpcord.modules;
 
 import io.github.alen_alex.helpcord.HelpCord;
-import io.github.alen_alex.helpcord.enums.CooldownKeys;
 import io.github.alen_alex.helpcord.enums.Tags;
 import io.github.alen_alex.helpcord.abstracts.AbstractListener;
+import io.github.alen_alex.helpcord.interfaces.Module;
 import io.github.alen_alex.helpcord.logs.Debug;
 import io.github.alen_alex.helpcord.models.CodeBlocks;
 import io.github.alen_alex.helpcord.utils.PasteUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
-public class PasteListener extends AbstractListener implements MessageCreateListener {
+public class PasteListener extends AbstractListener implements MessageCreateListener, Module {
+
+    private boolean enabled = false;
 
     public PasteListener(HelpCord handler) {
         super(handler);
-        register();
     }
 
     @Override
     public void onMessageCreate(MessageCreateEvent messageCreateEvent) {
+        if(messageCreateEvent.getMessageAuthor().isBotUser())
+            return;
+
         final String channelID = messageCreateEvent.getChannel().getIdAsString();
 
         /*
@@ -68,5 +72,47 @@ public class PasteListener extends AbstractListener implements MessageCreateList
     @Override
     protected void register() {
         getJavaCordAPI().addListener(this);
+    }
+
+    @Override
+    public String name() {
+        return "Paste";
+    }
+
+    @Override
+    public String description() {
+        return "Automatically uploads codes pasted with in code blocks to the provided paste server";
+    }
+
+    @Override
+    public void registerModule() {
+        if(enabled)
+            return;
+
+        if(shouldEnable()){
+            registerModule();
+            enabled = true;
+            instance.getLogger().info("Registered Module : "+name());
+        }
+    }
+
+    @Override
+    public void unregisterModule() {
+        if(!enabled)
+            return;
+
+        instance.getJavaCord().getJavaCordAPI().removeListener(this);
+        enabled = false;
+        instance.getLogger().info("Unregistered Module : "+name());
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public boolean shouldEnable() {
+        return instance.getConfigurationHandler().getConfiguration().isPasteEnabled();
     }
 }
